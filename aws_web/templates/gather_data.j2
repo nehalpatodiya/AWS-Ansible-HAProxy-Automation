@@ -1,0 +1,14 @@
+{% set w_count = namespace(value=0) %}
+
+instance_data:
+{% for i in gathered_data['instances'] %}
+  - app: {{ i['tags']['app'] }}
+    instance_id: {{ i['instance_id'] }}
+    instance_state: {{ i['state']['name'] }}
+{% if i['tags']['app']=='web' %}
+{% set w_count.value = w_count.value + 1 %}
+{% endif %}
+{% endfor %}
+
+web_count: {{ w_count.value }}
+web_count_input: 0

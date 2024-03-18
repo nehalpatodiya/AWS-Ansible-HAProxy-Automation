@@ -1,0 +1,15 @@
+---
+{% set l_count = namespace(value=0) %}
+
+instance_data:
+{% for i in gathered_data['instances'] %}
+  - app: {{ i['tags']['app'] }}
+    instance_id: {{ i['instance_id'] }}
+    instance_state: {{ i['state']['name'] }}
+{% if i['tags']['app']=='lb' %}
+{% set l_count.value = l_count.value + 1 %}
+{% endif %}
+{% endfor %}
+
+lb_count: {{ l_count.value }}
+lb_count_input: 0

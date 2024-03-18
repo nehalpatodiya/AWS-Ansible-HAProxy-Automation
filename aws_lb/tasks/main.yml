@@ -1,0 +1,61 @@
+- name: including variables
+  include_vars:
+    dir: vars
+- name: getting info of load balancer[running/stopped] from AWS
+  ec2_instance_info:
+    region: "{{ region }}"
+    filters:
+      "tag:app": ["lb"]
+      instance-state-name: ["running","stopped"]
+    aws_access_key: "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+  register: gathered_data
+- name: updating variable file with load balancer info
+  template:
+    src: "templates/gather_data.j2"
+    dest: "{{ role_path }}/vars/main.yml"
+  changed_when: False
+- name: refreshing variables
+  include_vars:
+    dir: vars
+- name: starting existing load balancer if already present in AWS
+  block:
+    - ec2_instance:
+        state: running
+        region: "{{ region }}"
+        instance_ids: "{{ item.instance_id }}"
+        instance_type: "{{ instance_type }}"
+        vpc_subnet_id: "{{ vpc_subnet_id }}"
+        aws_access_key: "{{ access_key }}"
+        aws_secret_key: "{{ secret_key }}"
+      loop: "{{ instance_data }}"
+  rescue:
+    - debug:
+        var: instance_data
+- debug: 
+    msg: "you have {{ lb_count }} load balancer."
+- pause:
+    prompt: "you have no load balancer, enter 1 for launching or enter 0 for not launching"
+    echo: yes
+  register: result_lb
+  when: lb_count < 1
+- name: launching new load balancer, if required
+  ec2_instance:
+    name: "{{ name }}"
+    count: "{{ count }}"
+    region: "{{ region }}"
+    image_id: "{{ image_id }}"
+    instance_type: "{{ instance_type }}"
+    key_name: "{{ key_name }}"
+    tags:
+      app: "lb"
+    network:
+      assign_public_ip: true
+    security_group: "{{ security_group }}"
+    vpc_subnet_id: "{{ vpc_subnet_id }}"
+    state: running
+    aws_access_key: "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+  when: lb_count < 1 and  (result_lb.user_input | int) > 0
+- name: refreshing inventory.
+  meta: refresh_inventory

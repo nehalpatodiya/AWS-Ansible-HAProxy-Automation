@@ -1,0 +1,12 @@
+---
+
+instance_data:
+  - app:
+    instance_id:
+    instance_state:
+
+
+web_running_count: 0
+lb_running_count: 0
+web_stopped_count: 0
+lb_stopped_count: 0

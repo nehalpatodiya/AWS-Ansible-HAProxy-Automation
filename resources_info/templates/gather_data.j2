@@ -1,0 +1,26 @@
+---
+{% set w_r_count = namespace(value=0) %}
+{% set l_r_count = namespace(value=0) %}
+{% set w_s_count = namespace(value=0) %}
+{% set l_s_count = namespace(value=0) %}
+
+instance_data:
+{% for i in gathered_data['instances'] %}
+  - app: {{ i['tags']['app'] }}
+    instance_id: {{ i['instance_id'] }}
+    instance_state: {{ i['state']['name'] }}
+{% if i['tags']['app']=='web' and i['state']['name']=='running' %}
+{% set w_r_count.value = w_r_count.value + 1 %}
+{% elif i['tags']['app']=='web' and i['state']['name']=='stopped' %}
+{% set w_s_count.value = w_s_count.value + 1 %}
+{% elif i['tags']['app']=='lb' and i['state']['name']=='running' %}
+{% set l_r_count.value = l_r_count.value + 1 %}
+{% elif i['tags']['app']=='lb' and i['state']['name']=='stopped' %}
+{% set l_s_count.value = l_s_count.value + 1 %}
+{% endif %}
+{% endfor %}
+
+web_running_count: {{ w_r_count.value }}
+lb_running_count: {{ l_r_count.value }}
+web_stopped_count: {{ w_s_count.value }}
+lb_stopped_count: {{ l_s_count.value }}

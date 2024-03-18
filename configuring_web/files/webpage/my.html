@@ -1,0 +1,25 @@
+<html>
+    <head>
+        <title>{{ ansible_facts['default_ipv4']['address'] }}</title>
+        <style>
+            pre {
+                font-family: Arial;
+                color: #000;
+                margin: 25px;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- html pre tag starts here -->
+        <pre>
+---------------------------------------------------------------------<br>
+| Hello !!                                                          <br>
+---------------------------------------------------------------------<br>
+| You are accessing - {{ ansible_facts['default_ipv4']['address'] }}<br>
+---------------------------------------------------------------------<br>
+
+
+        </pre>
+        <!-- html pre tag ends here -->
+    </body>
+</html>

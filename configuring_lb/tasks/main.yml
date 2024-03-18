@@ -1,0 +1,16 @@
+---
+- name: install haproxy service.
+  package:
+    name: haproxy
+    state: present
+- name: copy haproxy config file containing info of all webservers to load balancer.
+  template:
+    src: "files/lb/haproxy.cfg"
+    dest: "/etc/haproxy/haproxy.cfg"
+  notify:
+    - restart haproxy service
+- name: starting haproxy service & enabeling it.
+  service:
+    name: "haproxy"
+    state: started
+    enabled: yes

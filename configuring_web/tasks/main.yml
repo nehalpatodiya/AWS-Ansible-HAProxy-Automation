@@ -1,0 +1,16 @@
+---
+- name: install httpd service on all webservers.
+  package:
+    name: "httpd"
+    state: present
+- name: copy index.html in all webservers.
+  template:
+    src: "files/webpage/my.html"
+    dest: "/var/www/html/index.html"
+  notify:
+    - restart httpd service
+- name: starting httpd service and enabeling it.
+  service:
+    name: "httpd"
+    state: started
+    enabled: yes

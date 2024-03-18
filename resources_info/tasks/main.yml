@@ -1,0 +1,27 @@
+- name: including variables
+  include_vars:
+    dir: vars
+- name: gathering data of load balancer & webservers[running/stopped] from AWS.
+  ec2_instance_info:
+    region: "{{ region }}"
+    filters:
+      "tag:app": ["lb","web"]
+      instance-state-name: ["running","stopped"]
+    aws_access_key: "{{ access_key }}"
+    aws_secret_key: "{{ secret_key }}"
+  register: gathered_data
+- name: updating variable file with load balancer & webservers info
+  template:
+    src: "templates/gather_data.j2"
+    dest: "{{ role_path }}/vars/main.yml"
+- name: refreshing variables
+  include_vars:
+    dir: vars
+- debug:
+    msg: 
+      - "You have {{ lb_running_count }} running Load Balancers."
+      - "You have {{ web_running_count }} running Web Servers."
+      - "You have {{ lb_stopped_count }} stopped Load Balancers."
+      - "You have {{ web_stopped_count }} stopped Web Servers."
+- debug:
+    var: instance_data

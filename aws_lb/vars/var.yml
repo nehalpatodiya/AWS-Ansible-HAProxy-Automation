@@ -1,0 +1,9 @@
+---
+region: 'ap-south-1'
+instance_type:  't2.micro'
+vpc_subnet_id: 'subnet-05cfe7fcb9b8f24cf'
+image_id: 'ami-0d3f444bc76de0a79'
+key_name: 'K8'
+security_group: 'Ansible SG'
+name: 'ans_lb'
+count: 1
